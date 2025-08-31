@@ -1,4 +1,3 @@
-
 {
   "name": "Movie Night",
   "short_name": "Movies",
@@ -11,3 +10,5 @@
     { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
+
+

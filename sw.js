@@ -1,12 +1,11 @@
-const CACHE_NAME = 'movie-night-cache-v3';
+const CACHE_NAME = 'movie-night-cache-v4';
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './icon.png',
-  './style.css',  // replace with your actual CSS filename
-  './app.js',     // replace with your actual JS filename
-  // add any images used in your app, e.g. './images/movie1.png'
+  './app.js'  // only if you have a separate JS file
+  // Add any images your app uses here
 ];
 
 // Install – cache all files
@@ -29,7 +28,7 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch – serve cached first, then network
+// Fetch – serve cached files first
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))

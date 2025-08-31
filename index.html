@@ -1,19 +1,22 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-
-<!-- Optional: Apple support -->
-<link rel="apple-touch-icon" href="icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-
-<link rel="icon" type="image/png" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Movie Night</title>
+
+  <!-- PWA manifest and theme color -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
+
+  <!-- Apple / iOS support -->
+  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Your existing CSS – unchanged -->
   <style>
     :root {
       --bg: #121212;
@@ -23,13 +26,6 @@
       --watched: #4caf50;
       --border: #d1d107;
     }
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log('Service Worker Registered'))
-    .catch(err => console.log('Service Worker registration failed:', err));
-}
-</script>
 
     body {
       font-family: sans-serif;
@@ -37,28 +33,18 @@ if ('serviceWorker' in navigator) {
       padding: 0;
       background: var(--bg);
       color: var(--text);
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log('Service Worker Registered'))
-    .catch(err => console.log('Service Worker registration failed:', err));
-}
-</script>
-
     }
 
-    /* Header block with background */
     header {
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 2rem 1rem;
-      background: var(--card);        /* slightly lighter than bg */
-      border-bottom: 2px solid var(--accent); /* accent line under header */
-      box-shadow: 0 2px 8px rgba(0,0,0,0.6);  /* subtle shadow */
+      background: var(--card);
+      border-bottom: 2px solid var(--accent);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
     }
 
-    /* Title layout with icons */
     .title-with-icons {
       display: flex;
       justify-content: center;
@@ -68,23 +54,20 @@ if ('serviceWorker' in navigator) {
       text-align: center;
     }
 
-    /* Title text */
     .title-with-icons span {
-      font-size: 2.5rem; /* desktop */
+      font-size: 2.5rem;
       font-weight: bold;
       color: var(--text);
     }
 
-    /* Icons */
     .title-icon {
       height: 50px;
       max-width: 15vw;
     }
 
-    /* Small screens adjustments */
     @media (max-width: 600px) {
       .title-with-icons span {
-        font-size: 1.8rem; /* smaller text */
+        font-size: 1.8rem;
       }
       .title-icon {
         height: 35px;
@@ -276,6 +259,16 @@ if ('serviceWorker' in navigator) {
 
   <div id="movieList"></div>
 
+  <!-- Service worker registration for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('Service Worker Registered'))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    }
+  </script>
+
+  <!-- Your existing JS logic – unchanged -->
   <script>
     const API_KEY = "d578b4e2";
     const form = document.getElementById('movieForm');
