@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="icon.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Movie Night</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --text: #f0f0f0;
+      --accent: #2196f3;
+      --watched: #4caf50;
+      --border: #d1d107;
+    }
+
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Header block with background */
+    header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
+      background: var(--card);        /* slightly lighter than bg */
+      border-bottom: 2px solid var(--accent); /* accent line under header */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);  /* subtle shadow */
+    }
+
+    /* Title layout with icons */
+    .title-with-icons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+
+    /* Title text */
+    .title-with-icons span {
+      font-size: 2.5rem; /* desktop */
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    /* Icons */
+    .title-icon {
+      height: 50px;
+      max-width: 15vw;
+    }
+
+    /* Small screens adjustments */
+    @media (max-width: 600px) {
+      .title-with-icons span {
+        font-size: 1.8rem; /* smaller text */
+      }
+      .title-icon {
+        height: 35px;
+        max-width: 20vw;
+      }
+    }
+
+    form, .movie, .sort-bar {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      background: #2a2a2a;
+      color: var(--text);
+      border: 1px solid #444;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #aaa;
+    }
+
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .movie {
+      border-left: 5px solid var(--accent);
+    }
+
+    .movie.watched {
+      border-left-color: var(--watched);
+      opacity: 0.9;
+    }
+
+    .movie-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .movie-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .small {
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .delete-icon {
+      font-size: 1rem;
+      color: #ff6b6b;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      user-select: none;
+      transition: transform 0.2s ease;
+    }
+
+    .delete-icon:hover {
+      transform: scale(1.2);
+      color: #ff4b4b;
+    }
+
+    .edit-icon {
+      font-size: 1rem;
+      color: #ffd54f;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      user-select: none;
+    }
+
+    .stars {
+      display: flex;
+      gap: 0.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .star {
+      font-size: 1.3rem;
+      color: #555;
+      cursor: pointer;
+    }
+
+    .star.selected {
+      color: gold;
+    }
+
+    .poster-preview {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .poster-preview img {
+      max-width: 150px;
+      border-radius: 10px;
+      border: 1px solid #444;
+    }
+
+    .fetch-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .fetch-row button {
+      width: auto;
+      padding: 0.5rem 1rem;
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1rem;
+    }
+
+    .filters select {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="title-with-icons">
+      <img src="icon.png" alt="Movie Club Icon" class="title-icon">
+      <span>Movie Night</span>
+      <img src="icon.png" alt="Movie Club Icon" class="title-icon">
+    </h1>
+  </header>
+
+  <form id="movieForm">
+    <label>Title:</label>
+    <div class="fetch-row">
+      <input type="text" id="title" required placeholder="Enter movie title">
+      <button type="button" onclick="fetchMovieInfo()">🔍 Fetch Info</button>
+    </div>
+
+    <label>Genre:</label>
+    <input type="text" id="genre" placeholder="e.g., Sci-Fi, Comedy">
+
+    <label>Description:</label>
+    <textarea id="description" rows="3" placeholder="Short summary..."></textarea>
+
+    <div class="poster-preview" id="posterPreview"></div>
+
+    <button type="submit">Add Movie</button>
+  </form>
+
+  <div class="sort-bar filters">
+    <select id="sort">
+      <option value="default">🕒 Order Added</option>
+      <option value="az">🔤 A–Z</option>
+      <option value="rating">⭐ Highest Rating</option>
+    </select>
+
+    <select id="filterWatched">
+      <option value="all">🎞️ All</option>
+      <option value="watched">✅ Watched</option>
+      <option value="unwatched">📽️ Unwatched</option>
+    </select>
+
+    <select id="filterGenre">
+      <option value="all">🎭 All Genres</option>
+    </select>
+  </div>
+
+  <div id="movieList"></div>
+
+  <script>
+    const API_KEY = "d578b4e2";
+    const form = document.getElementById('movieForm');
+    const list = document.getElementById('movieList');
+    const sortSelect = document.getElementById('sort');
+    const filterWatched = document.getElementById('filterWatched');
+    const filterGenre = document.getElementById('filterGenre');
+    const posterPreview = document.getElementById('posterPreview');
+
+    let movies = JSON.parse(localStorage.getItem('movies') || '[]');
+    let editIndex = null;
+
+    function saveMovies() {
+      localStorage.setItem('movies', JSON.stringify(movies));
+    }
+
+    function renderStars(count, index) {
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        const selected = i <= count ? 'selected' : '';
+        html += `<span class="star ${selected}" onclick="setRating(${index}, ${i})">★</span>`;
+      }
+      return html;
+    }
+
+    function setRating(index, value) {
+      movies[index].rating = value;
+      saveMovies();
+      renderMovies();
+    }
+
+    function toggleWatched(index) {
+      movies[index].watched = !movies[index].watched;
+      saveMovies();
+      renderMovies();
+    }
+
+    function renderMovies() {
+      list.innerHTML = '';
+      const sortBy = sortSelect.value;
+      const watchedFilter = filterWatched.value;
+      const genreFilter = filterGenre.value;
+
+      let filtered = movies.filter(m => {
+        const matchWatched = watchedFilter === 'all' || (watchedFilter === 'watched' && m.watched) || (watchedFilter === 'unwatched' && !m.watched);
+        const matchGenre = genreFilter === 'all' || m.genre?.toLowerCase().includes(genreFilter.toLowerCase());
+        return matchWatched && matchGenre;
+      });
+
+      if (sortBy === 'az') {
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+      } else if (sortBy === 'rating') {
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      }
+
+      const genres = new Set();
+      movies.forEach(m => m.genre?.split(',').forEach(g => genres.add(g.trim())));
+      filterGenre.innerHTML = '<option value="all">🎭 All Genres</option>' + Array.from(genres).sort().map(g => `<option value="${g}">${g}</option>`).join('');
+
+      filtered.forEach((movie, index) => {
+        const div = document.createElement('div');
+        div.className = 'movie' + (movie.watched ? ' watched' : '');
+        div.innerHTML = `
+          <div class="movie-header">
+            <span class="movie-title">${movie.title}</span>
+            <span>
+              <span class="edit-icon" onclick="editMovie(${index})">✏️</span>
+              <span class="delete-icon" onclick="deleteMovie(${index})">🗑️</span>
+            </span>
+          </div>
+          <div class="small"><strong>Genre:</strong> ${movie.genre}</div>
+          <div class="small"><strong>Description:</strong> ${movie.description}</div>
+          <div class="small"><strong>Rating:</strong> ${renderStars(movie.rating || 0, index)}</div>
+          <div class="small">
+            <label><input type="checkbox" onchange="toggleWatched(${index})" ${movie.watched ? 'checked' : ''}> Watched</label>
+          </div>
+          ${movie.poster ? `<div style="text-align:center;"><img src="${movie.poster}" alt="Poster" style="max-width:100px; margin-top:0.5rem; border-radius:6px;"></div>` : ''}
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function deleteMovie(index) {
+      if (confirm("Delete this movie?")) {
+        movies.splice(index, 1);
+        saveMovies();
+        renderMovies();
+      }
+    }
+
+    function editMovie(index) {
+      const m = movies[index];
+      title.value = m.title;
+      genre.value = m.genre;
+      description.value = m.description;
+      posterPreview.innerHTML = m.poster ? `<img src="${m.poster}" alt="Poster">` : '';
+      editIndex = index;
+    }
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const newMovie = {
+        title: title.value.trim(),
+        genre: genre.value.trim(),
+        description: description.value.trim(),
+        poster: posterPreview.querySelector('img')?.src || '',
+        rating: 0,
+        watched: false
+      };
+
+      if (editIndex !== null) {
+        movies[editIndex] = { ...movies[editIndex], ...newMovie };
+        editIndex = null;
+      } else {
+        movies.push(newMovie);
+      }
+
+      saveMovies();
+      form.reset();
+      posterPreview.innerHTML = '';
+      renderMovies();
+    };
+
+    sortSelect.onchange = renderMovies;
+    filterWatched.onchange = renderMovies;
+    filterGenre.onchange = renderMovies;
+
+    function fetchMovieInfo() {
+      const titleVal = title.value.trim();
+      if (!titleVal) return alert("Enter a movie title first.");
+      fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(titleVal)}&apikey=${API_KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.Response === "False") return alert("Movie not found.");
+          genre.value = data.Genre || '';
+          description.value = data.Plot || '';
+          if (data.Poster && data.Poster !== "N/A") {
+            posterPreview.innerHTML = `<img src="${data.Poster}" alt="Poster">`;
+          } else {
+            posterPreview.innerHTML = '';
+          }
+        })
+        .catch(() => alert("Error fetching movie info."));
+    }
+
+    renderMovies();
+  </script>
+</body>
+</html>
